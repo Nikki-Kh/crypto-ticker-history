@@ -1,14 +1,30 @@
 package com.nikh.cth.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.nikh.cth.bean.request.TickerRateIntervalRequest;
+import com.nikh.cth.service.TickerRateService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/tickers")
+@RequestMapping("/tickers/rates")
 public class TickersController {
 
+    @Autowired
+    TickerRateService tickerRateService;
 
-    //TODO: getLastTickerRates
-    //TODO: getTickerRateHistory
-    //TODO: getIntervalDataForTickerRate
+    @GetMapping
+    ResponseEntity<?> getLastTickerRates(@RequestParam("brkId") Integer brkId){
+        return ResponseEntity.ok(tickerRateService.getLastTickerRates(brkId));
+    }
+
+    @GetMapping("/history")
+    ResponseEntity<?> getTickerRateHistory(@RequestParam("brkId") Integer brkId){
+        return ResponseEntity.ok(tickerRateService.getLastTickerRates(brkId));
+    }
+
+    @GetMapping("/interval")
+    ResponseEntity<?> getTickerRateIntervalData(@RequestBody TickerRateIntervalRequest request){
+        return ResponseEntity.ok(tickerRateService.getIntervalData(request));
+    }
 }

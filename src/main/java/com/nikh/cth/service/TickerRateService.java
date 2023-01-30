@@ -6,7 +6,7 @@ import com.nikh.cth.bean.ticker.TickerRateIntervalData;
 
 import java.util.List;
 
-public interface TickerRateHistoryService {
+public interface TickerRateService {
 
     List<TickerRate> getLastTickerRates(Integer brkId);
     List<TickerRate> getTickerHistory(Integer brkId);
