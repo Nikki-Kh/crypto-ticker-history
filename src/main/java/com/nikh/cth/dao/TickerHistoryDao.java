@@ -13,14 +13,14 @@ import java.util.List;
 public interface TickerHistoryDao {
 
     String GET_TICKER_HISTORY_SQL = """
-            SELECT * from ticker_value_history
+            SELECT * from ticker_rate_history
             WHERE brk_id = #{brkId}
             AND ticker_name = #{tickerName}
             ORDER BY created_when desc
             """;
 
     String GET_TICKER_HISTORY_BY_DATES_SQL = """
-            SELECT * from ticker_value_history
+            SELECT * from ticker_rate_history
             WHERE brk_id = #{request.brkId}
             AND ticker_name = #{request.tickerName}
             AND created_when >= #{request.startDate}

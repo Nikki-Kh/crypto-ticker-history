@@ -20,13 +20,16 @@ CREATE TABLE broker_tickers (
     CONSTRAINT FOREIGN
 );
 
-CREATE TABLE ticker_value_history (
+CREATE TABLE ticker_rate_history (
     id INTEGER NOT NULL AUTO_INCREMENT,
     brk_id INTEGER NOT NULL
     CONSTRAINT broker_tickers_brk_id_FOREIGN_KEY REFERENCES brokers,
     ticker_name VARCHAR(32) NOT NULL,
-    ticker_value NUMERIC NOT NULL,
+    ticker_rate NUMERIC NOT NULL,
     created_when timestamp default now(),
     updated_when timestamp default now(),
     PRIMARY KEY (id)
 );
+
+CREATE INDEX idx_created_when
+ON ticker_rate_history(created_when);
