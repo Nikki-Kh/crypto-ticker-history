@@ -1,5 +1,6 @@
 package com.nikh.cth.dao;
 
+import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,10 +21,10 @@ public interface TickerHistoryDao {
 
     String GET_TICKER_HISTORY_BY_DATES_SQL = """
             SELECT * from ticker_value_history
-            WHERE brk_id = #{brkId}
-            AND ticker_name = #{tickerName}
-            AND created_when >= #{startDate}
-            AND created_when <= #{endDate}
+            WHERE brk_id = #{request.brkId}
+            AND ticker_name = #{request.tickerName}
+            AND created_when >= #{request.startDate}
+            AND created_when <= #{request.endDate}
             ORDER BY created_when asc
             """;
 
@@ -32,8 +33,5 @@ public interface TickerHistoryDao {
                                       @Param("tickerName") String tickerName);
 
     @Select(GET_TICKER_HISTORY_BY_DATES_SQL)
-    List<TickerRate> getTickerHistory(@Param("brkId") Integer brkId,
-                                      @Param("tickerName") String tickerName,
-                                      @Param("startDate")LocalDateTime startDate,
-                                      @Param("endDate") LocalDateTime endDate);
+    List<TickerRate> getTickerHistory(@Param("request") TickerRateRequest request);
 }

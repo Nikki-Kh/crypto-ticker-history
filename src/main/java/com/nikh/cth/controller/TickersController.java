@@ -1,6 +1,6 @@
 package com.nikh.cth.controller;
 
-import com.nikh.cth.bean.request.TickerRateIntervalRequest;
+import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.service.TickerRateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class TickersController {
     }
 
     @GetMapping("/interval")
-    ResponseEntity<?> getTickerRateIntervalData(@RequestBody TickerRateIntervalRequest request){
+    ResponseEntity<?> getTickerRateIntervalData(@RequestBody TickerRateRequest request){
         return ResponseEntity.ok(tickerRateService.getIntervalData(request));
     }
 }
