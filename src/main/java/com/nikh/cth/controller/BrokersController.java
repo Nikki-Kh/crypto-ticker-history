@@ -2,6 +2,7 @@ package com.nikh.cth.controller;
 
 import com.nikh.cth.service.BrokerService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +22,7 @@ public class BrokersController {
     }
 
     @GetMapping("/{brokerId}")
-    public ResponseEntity<?> getBrokerTickers(@PathVariable("brokerId") Integer brkId) {
+    public ResponseEntity<?> getBrokerTickers(@PathVariable("brokerId") @NotNull Integer brkId) {
         return ResponseEntity.ok(brokerService.getBrokerTickers(brkId));
     }
 

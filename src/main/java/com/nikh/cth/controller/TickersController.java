@@ -19,8 +19,8 @@ public class TickersController {
     }
 
     @GetMapping("/history")
-    ResponseEntity<?> getTickerRateHistory(@RequestParam("brkId") Integer brkId){
-        return ResponseEntity.ok(tickerRateService.getLastTickerRates(brkId));
+    ResponseEntity<?> getTickerRateHistory(@RequestBody TickerRateRequest request){
+        return ResponseEntity.ok(tickerRateService.getTickerHistory(request));
     }
 
     @GetMapping("/interval")
