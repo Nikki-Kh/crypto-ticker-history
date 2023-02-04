@@ -1,4 +1,4 @@
-package com.nikh.cth.controller;
+package com.nikh.cth.web.controller;
 
 import com.nikh.cth.service.BrokerService;
 import lombok.RequiredArgsConstructor;

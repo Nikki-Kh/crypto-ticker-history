@@ -28,7 +28,7 @@ public class BrokerCache {
         brokers = brokerDao.getBrokers();
         brokerTickers = loadBrokerTickers();
         if (brokerTickers.isEmpty()) {
-            throw new RuntimeException("failed to load cache");
+            throw new RuntimeException("Failed to load cache");
         }
     }
 

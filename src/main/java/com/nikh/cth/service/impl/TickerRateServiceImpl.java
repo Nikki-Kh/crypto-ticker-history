@@ -3,8 +3,9 @@ package com.nikh.cth.service.impl;
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.bean.ticker.TickerRateIntervalData;
-import com.nikh.cth.cache.TickerRateCache;
-import com.nikh.cth.dao.TickerHistoryDao;
+import com.nikh.cth.dao.TickerRateHistoryDao;
+import com.nikh.cth.error.ApiException;
+import com.nikh.cth.error.ExceptionCode;
 import com.nikh.cth.service.TickerRateService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,39 +21,37 @@ import java.util.List;
 public class TickerRateServiceImpl implements TickerRateService {
 
     @Autowired
-    TickerRateCache tickerRateCache;
-    @Autowired
-    TickerHistoryDao tickerHistoryDao;
+    TickerRateHistoryDao tickerRateHistoryDao;
 
 
     @Override
     public List<TickerRate> getLastTickerRates(Integer brkId) {
-        return brkId != null ? tickerRateCache.getLatestRatesByBroker(brkId) : tickerRateCache.getAllLatestRates();
+        return tickerRateHistoryDao.getLastTickerRates(brkId);
     }
 
     @Override
     public List<TickerRate> getTickerHistory(TickerRateRequest request) {
-        return tickerHistoryDao.getTickerHistory(request);
+        return tickerRateHistoryDao.getTickerHistory(request);
     }
 
     @Override
-    public List<TickerRateIntervalData> getIntervalData(TickerRateRequest request) {
-        var tickerHistory = tickerHistoryDao.getTickerHistory(request);
+    public List<TickerRateIntervalData> getIntervalData(TickerRateRequest request) throws ApiException {
+        var chronoPair = parseIntervalExp(request.getIntervalPeriod());
+        var tickerHistory = tickerRateHistoryDao.getTickerHistory(request);
         if (tickerHistory.isEmpty()) {
             return Collections.emptyList();
         }
-        var chronoPair = parseIntervalExp(request.getIntervalPeriod());
         return getIntervalData(tickerHistory, chronoPair);
     }
 
-    private Pair<Integer, ChronoUnit> parseIntervalExp( String exp) {
+    private Pair<Integer, ChronoUnit> parseIntervalExp( String exp) throws ApiException {
         var period = Integer.parseInt(exp.substring(0, exp.length() - 1));
         char chronoUnitChar = exp.charAt(exp.length() - 1);
         ChronoUnit chronoUnit = switch (chronoUnitChar) {
             case 's' -> ChronoUnit.SECONDS;
             case 'm' -> ChronoUnit.MINUTES;
             case 'h' -> ChronoUnit.HOURS;
-            default -> throw new RuntimeException("meh");
+            default -> throw new ApiException("Invalid request", ExceptionCode.INVALID_REQUEST);
         };
         return Pair.of(period, chronoUnit);
     }

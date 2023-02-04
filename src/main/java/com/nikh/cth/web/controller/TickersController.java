@@ -1,6 +1,8 @@
-package com.nikh.cth.controller;
+package com.nikh.cth.web.controller;
 
 import com.nikh.cth.bean.request.TickerRateRequest;
+import com.nikh.cth.error.ApiException;
+import com.nikh.cth.error.ExceptionCode;
 import com.nikh.cth.service.TickerRateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,10 @@ public class TickersController {
     }
 
     @GetMapping("/interval")
-    ResponseEntity<?> getTickerRateIntervalData(@RequestBody TickerRateRequest request){
+    ResponseEntity<?> getTickerRateIntervalData(@RequestBody TickerRateRequest request) throws ApiException {
+        if (request.getIntervalPeriod() == null) {
+            throw new ApiException("Invalid request", ExceptionCode.INVALID_REQUEST);
+        }
         return ResponseEntity.ok(tickerRateService.getIntervalData(request));
     }
 }
