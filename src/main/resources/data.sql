@@ -1,3 +1,9 @@
-INSERT INTO users(username, password) VALUES ('admin', 'admin');
+INSERT INTO brokers (brk_name, API_addr, upd_interval) values 
+('Kraken', 'http://', 5),
+('Kucoin', 'http://', 5);
 
-INSERT INTO reviews(product_id, avg_score, review_num) VALUES ('BB5476', 5.75, 100);
+INSERT INTO broker_tickers (brk_id, ticker_name) values 
+(1, 'test1'),
+(1, 'test2'),
+(2, 'test1'),
+(2, 'test2');

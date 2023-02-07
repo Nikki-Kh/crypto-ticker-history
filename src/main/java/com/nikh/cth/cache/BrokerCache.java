@@ -4,6 +4,10 @@ import com.nikh.cth.bean.broker.BrokerToTickerDBEntry;
 import com.nikh.cth.dao.BrokerDao;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import com.nikh.cth.bean.broker.Broker;
 
@@ -14,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-@NoArgsConstructor
 public class BrokerCache {
 
     @Autowired
@@ -23,8 +26,9 @@ public class BrokerCache {
     private List<Broker> brokers;
     private Map<Integer, List<String>> brokerTickers;
 
-    @PostConstruct
-    void init() {
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(1)
+    public void initCache() {
         brokers = brokerDao.getBrokers();
         brokerTickers = loadBrokerTickers();
         if (brokerTickers.isEmpty()) {

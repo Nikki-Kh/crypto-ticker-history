@@ -6,5 +6,6 @@ import org.intellij.lang.annotations.MagicConstant;
 public @interface ExceptionCode {
 
      int INVALID_REQUEST = 1;
+     int HTTP_CALL_FAILED = 2;
 
 }
