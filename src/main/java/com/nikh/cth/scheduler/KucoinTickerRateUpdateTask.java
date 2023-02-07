@@ -1,6 +1,6 @@
 package com.nikh.cth.scheduler;
 
-import com.nikh.cth.bean.web.AbstractWebTickerRate;
+import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.bean.web.response.KrakenTickerRateResponse;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import com.nikh.cth.error.ApiException;
@@ -18,23 +18,23 @@ import java.util.concurrent.ExecutionException;
 
 @Builder
 @Slf4j
-public class KucoinTickerRateUpdateTask extends TickerRateUpdateTask{
+public final class KucoinTickerRateUpdateTask extends TickerRateUpdateTask{
 
     private final String urlSuffix = "?";
 
-    KucoinTickerRateUpdateTask(String brokerName, Integer updateInterval, String apiAddr, String apiKey, WebClient webClient, List<String> tickers, TickerRateHistoryDao tickerRateHistoryDao) {
-        super(brokerName, updateInterval, apiAddr, apiKey, tickers, webClient, tickerRateHistoryDao);
+    KucoinTickerRateUpdateTask(Integer brkId, String brokerName, Integer updateInterval, String apiAddr, String apiKey, WebClient webClient, List<String> tickers, TickerRateHistoryDao tickerRateHistoryDao) {
+        super(brkId, brokerName, updateInterval, apiAddr, apiKey, tickers, webClient, tickerRateHistoryDao);
     }
 
     @SneakyThrows
     @Override
     public void run() {
-        var result = getLatestТickerRates();
+        var result = getLatestTickerRates();
         uploadDataToDatabase(result);
     }
 
     @Override
-    protected List<AbstractWebTickerRate> getLatestТickerRates() {
+    protected List<TickerRate> getLatestTickerRates() {
         try {
             var result = webClient.get().uri(apiAddr + urlSuffix + StringUtils.joinWith(",", tickers))
                     .accept(MediaType.APPLICATION_JSON)
@@ -45,6 +45,7 @@ public class KucoinTickerRateUpdateTask extends TickerRateUpdateTask{
                 throw new ApiException(result.hasBody() ?
                         StringUtils.joinWith(";", result.getBody().getErrors()) : "Empty response", 2);
             }
+
         }
         catch (ExecutionException | InterruptedException | ApiException  e) {
             log.error("Failed to get response from 3rd party call. Broker: {}", brokerName, e);
@@ -56,7 +57,7 @@ public class KucoinTickerRateUpdateTask extends TickerRateUpdateTask{
     }
 
     @Override
-    protected void uploadDataToDatabase(List<AbstractWebTickerRate> tickerRates) {
+    protected void uploadDataToDatabase(List<TickerRate> tickerRates) {
 
     }
 }

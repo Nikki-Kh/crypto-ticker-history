@@ -3,6 +3,7 @@ package com.nikh.cth.bean.web.response;
 import com.nikh.cth.bean.web.KrakenTickerRate;
 import lombok.Builder;
 import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 @Builder
 public class KrakenTickerRateResponse {
 
-    Map<String, KrakenTickerRate> result;
-    List<String> errors;
+    private Map<String, KrakenTickerRate> result;
+    private List<String> errors;
 
 }

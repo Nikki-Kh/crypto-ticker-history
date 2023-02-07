@@ -2,6 +2,7 @@ package com.nikh.cth.dao;
 
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -38,9 +39,26 @@ public interface TickerRateHistoryDao {
             ORDER BY created_when asc
             """;
 
+
+    String INSERT_NEW_TICKER_RATES_SQL = """
+            <script>
+            INSERT INTO ticker_rate_history
+            (brk_id, ticker_name, ticker_rate)
+            VALUES
+            <foreach collection="tRates" item = "tRate" index="index" open="(" separator="),("  close=")">
+                #{tRate.brkId},
+                #{tRate.tickerName},
+                #{tRate.value}
+            </foreach>
+            </script>
+            """;
+
     @Select(GET_LAST_TICKER_RATES)
     List<TickerRate> getLastTickerRates(@Param("brkId") Integer brkId);
 
     @Select(GET_TICKER_RATE_HISTORY_BY_DATES_SQL)
     List<TickerRate> getTickerHistory(@Param("request") TickerRateRequest request);
+
+    @Insert(INSERT_NEW_TICKER_RATES_SQL)
+    int insertNewTickerRates(@Param("tRates") List<TickerRate> tickerRates);
 }

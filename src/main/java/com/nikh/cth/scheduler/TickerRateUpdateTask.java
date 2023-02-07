@@ -1,7 +1,7 @@
 package com.nikh.cth.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nikh.cth.bean.web.AbstractWebTickerRate;
+import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 @AllArgsConstructor
 public abstract class TickerRateUpdateTask implements Runnable{
 
+    protected Integer brkId;
     protected String brokerName;
     protected Integer updateInterval;
     protected String apiAddr;
@@ -29,7 +30,7 @@ public abstract class TickerRateUpdateTask implements Runnable{
     @Override
     public abstract void run();
 
-    protected abstract List<AbstractWebTickerRate> getLatestТickerRates() throws ExecutionException, InterruptedException;
+    protected abstract List<TickerRate> getLatestTickerRates() throws ExecutionException, InterruptedException;
 
-    protected abstract void uploadDataToDatabase(List<AbstractWebTickerRate> tickerRates);
+    protected abstract void uploadDataToDatabase(List<TickerRate> tickerRates);
 }

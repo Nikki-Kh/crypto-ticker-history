@@ -47,14 +47,16 @@ public class TickerRateUpdateTaskDealer {
 
             var tickers = brokerCache.getTickers(broker.getBrkId());
             TickerRateUpdateTask task = switch(broker.getBrkName()) {
-                case "Kraken" -> new KrakenTickerRateUpdateTask(broker.getBrkName(),
-                                                                broker.getUpdInterval(),
+                case "Kraken" -> new KrakenTickerRateUpdateTask(broker.getBrkId(),
+                        broker.getBrkName(),
+                        broker.getUpdInterval(),
                         broker.getApiAddr(),
                         broker.getApiKey(),
                         webClient,
                         tickers,
                         tickerRateHistoryDao);
-                case "Kucoin" -> new KucoinTickerRateUpdateTask(broker.getBrkName(),
+                case "Kucoin" -> new KucoinTickerRateUpdateTask(broker.getBrkId(),
+                        broker.getBrkName(),
                         broker.getUpdInterval(),
                         broker.getApiAddr(),
                         broker.getApiKey(),
