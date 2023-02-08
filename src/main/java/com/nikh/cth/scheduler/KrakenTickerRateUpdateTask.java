@@ -23,17 +23,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class KrakenTickerRateUpdateTask extends TickerRateUpdateTask{
 
-    private final String urlSuffix = "?pair=";
+    private final String urlSuffix = "/0/public/Ticker?pair=";
 
     KrakenTickerRateUpdateTask(Integer brkId, String brokerName, Integer updateInterval, String apiAddr, String apiKey, WebClient webClient, List<String> tickers, TickerRateHistoryDao tickerRateHistoryDao) {
         super(brkId, brokerName, updateInterval, apiAddr, apiKey, tickers, webClient, tickerRateHistoryDao);
-    }
-
-    @SneakyThrows
-    @Override
-    public void run() {
-        var result = getLatestTickerRates();
-        uploadDataToDatabase(result);
     }
 
     @Override
@@ -48,12 +41,13 @@ public final class KrakenTickerRateUpdateTask extends TickerRateUpdateTask{
                 throw new ApiException(result.hasBody() ?
                         StringUtils.joinWith(";", Objects.requireNonNull(result.getBody()).getErrors()) : "Empty response", ExceptionCode.HTTP_CALL_FAILED);
             }
-            return result.getBody().getResult().entrySet().stream().map(entry -> TickerRate.builder()
-                                                                                            .brkId(brkId)
-                                                                                            .tickerName(entry.getKey())
-                                                                                            .value(entry.getValue().getValue())
-                                                                                            .build()
-                                                ).collect(Collectors.toList());
+            return result.getBody().getResult().entrySet().stream()
+                    .map(entry -> TickerRate.builder()
+                                    .brkId(brkId)
+                                    .tickerName(entry.getKey())
+                                    .value(entry.getValue().getValue())
+                                    .build())
+                    .collect(Collectors.toList());
         }
         catch (ExecutionException | InterruptedException | ApiException  e) {
             log.error("Failed to get response from 3rd party call. Broker: {}", brokerName, e);
@@ -61,8 +55,4 @@ public final class KrakenTickerRateUpdateTask extends TickerRateUpdateTask{
         }
     }
 
-    @Override
-    protected void uploadDataToDatabase(List<TickerRate> rates) {
-        tickerRateHistoryDao.insertNewTickerRates(rates);
-    }
 }

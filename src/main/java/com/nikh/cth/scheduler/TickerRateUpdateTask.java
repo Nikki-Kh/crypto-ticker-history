@@ -28,9 +28,16 @@ public abstract class TickerRateUpdateTask implements Runnable{
 
 
     @Override
-    public abstract void run();
+    public void run() {
+        var result = getLatestTickerRates();
+        if (!result.isEmpty()) {
+            uploadDataToDatabase(result);
+        }
+    }
 
-    protected abstract List<TickerRate> getLatestTickerRates() throws ExecutionException, InterruptedException;
+    protected abstract List<TickerRate> getLatestTickerRates();
 
-    protected abstract void uploadDataToDatabase(List<TickerRate> tickerRates);
+    protected void uploadDataToDatabase(List<TickerRate> rates) {
+        tickerRateHistoryDao.insertNewTickerRates(rates);
+    }
 }

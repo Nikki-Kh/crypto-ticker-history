@@ -24,7 +24,7 @@ public class KucoinTickerRate {
     private Float  takerCoefficient;
     private Float  makerCoefficient;
 
-    Float getValue() {
+    public Float getValue() {
         return last;
     }
 }
