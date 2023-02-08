@@ -21,9 +21,6 @@ public class BrokersController {
 
     private final BrokerService brokerService;
 
-    @Autowired
-    ApplicationContext applicationContext;
-
     @GetMapping
     public ResponseEntity<?> getBrokers() {
         return ResponseEntity.ok(brokerService.getBrokers());
@@ -34,11 +31,5 @@ public class BrokersController {
         return ResponseEntity.ok(brokerService.getBrokerTickers(brkId));
     }
 
-
-    @GetMapping("/beans")
-    public ResponseEntity<?> getBeans() {
-        ConfigurableApplicationContext configContext = (ConfigurableApplicationContext) applicationContext;
-        return ResponseEntity.ok(configContext.getBeansOfType(TickerRateUpdateTask.class));
-    }
 
 }
