@@ -2,16 +2,15 @@ package com.nikh.cth.cache;
 
 import com.nikh.cth.bean.broker.BrokerToTickerDBEntry;
 import com.nikh.cth.dao.BrokerDao;
-import lombok.NoArgsConstructor;
+import com.nikh.cth.error.ServerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import com.nikh.cth.bean.broker.Broker;
 
-import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +25,14 @@ public class BrokerCache {
     private List<Broker> brokers;
     private Map<Integer, List<String>> brokerTickers;
 
-    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(value = ApplicationReadyEvent.class,
+            condition = "@environment.getActiveProfiles()[0] != 'test'")
     @Order(1)
     public void initCache() {
         brokers = brokerDao.getBrokers();
         brokerTickers = loadBrokerTickers();
         if (brokerTickers.isEmpty()) {
-            throw new RuntimeException("Failed to load cache");
+            throw new ServerException("Failed to load cache");
         }
     }
 

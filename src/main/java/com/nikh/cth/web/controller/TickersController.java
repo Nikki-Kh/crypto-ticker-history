@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/tickers/rates")
 public class TickersController {
@@ -16,8 +18,8 @@ public class TickersController {
     TickerRateService tickerRateService;
 
     @GetMapping
-    ResponseEntity<?> getLastTickerRates(@RequestParam("brkId") Integer brkId){
-        return ResponseEntity.ok(tickerRateService.getLastTickerRates(brkId));
+    ResponseEntity<?> getLastTickerRates(@RequestParam("brkId") Optional<Integer> brkId){
+        return ResponseEntity.ok(tickerRateService.getLastTickerRates(brkId.orElse(null)));
     }
 
     @GetMapping("/history")

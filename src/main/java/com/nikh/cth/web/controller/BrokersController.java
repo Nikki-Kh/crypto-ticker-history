@@ -1,13 +1,8 @@
 package com.nikh.cth.web.controller;
 
-import com.nikh.cth.cache.BrokerCache;
-import com.nikh.cth.scheduler.TickerRateUpdateTask;
 import com.nikh.cth.service.BrokerService;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

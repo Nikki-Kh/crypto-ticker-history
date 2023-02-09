@@ -36,7 +36,7 @@ public interface TickerRateHistoryDao {
             AND ticker_name = #{request.tickerName}
             AND created_when >= #{request.startDate}
             AND created_when <= #{request.endDate}
-            ORDER BY created_when asc
+            ORDER BY created_when #{order}
             """;
 
 
@@ -57,7 +57,7 @@ public interface TickerRateHistoryDao {
     List<TickerRate> getLastTickerRates(@Param("brkId") Integer brkId);
 
     @Select(GET_TICKER_RATE_HISTORY_BY_DATES_SQL)
-    List<TickerRate> getTickerHistory(@Param("request") TickerRateRequest request);
+    List<TickerRate> getTickerHistory(@Param("request") TickerRateRequest request, @Param("order") @SortOrder String order);
 
     @Insert(INSERT_NEW_TICKER_RATES_SQL)
     int insertNewTickerRates(@Param("tRates") List<TickerRate> tickerRates);

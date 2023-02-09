@@ -1,11 +1,9 @@
 package com.nikh.cth.scheduler;
 
 import com.nikh.cth.cache.BrokerCache;
-import com.nikh.cth.dao.BrokerDao;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.SingletonBeanRegistry;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,10 +11,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;

@@ -3,6 +3,7 @@ package com.nikh.cth.service.impl;
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.bean.ticker.TickerRateIntervalData;
+import com.nikh.cth.dao.SortOrder;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import com.nikh.cth.error.ApiException;
 import com.nikh.cth.error.ExceptionCode;
@@ -31,13 +32,13 @@ public class TickerRateServiceImpl implements TickerRateService {
 
     @Override
     public List<TickerRate> getTickerHistory(TickerRateRequest request) {
-        return tickerRateHistoryDao.getTickerHistory(request);
+        return tickerRateHistoryDao.getTickerHistory(request, SortOrder.DESC);
     }
 
     @Override
     public List<TickerRateIntervalData> getIntervalData(TickerRateRequest request) throws ApiException {
         var chronoPair = parseIntervalExp(request.getIntervalPeriod());
-        var tickerHistory = tickerRateHistoryDao.getTickerHistory(request);
+        var tickerHistory = tickerRateHistoryDao.getTickerHistory(request, SortOrder.ASC);
         if (tickerHistory.isEmpty()) {
             return Collections.emptyList();
         }
@@ -89,14 +90,14 @@ public class TickerRateServiceImpl implements TickerRateService {
                 intEnd = intStart.plus(chronoPair.getLeft(), chronoPair.getRight());
                 count = 1;
             }
-            tickerRateIntervalData = TickerRateIntervalData.builder()
-                    .minRate(minRate)
-                    .maxRate(maxRate)
-                    .avgRate(avgRate / count)
-                    .startDate(intStart)
-                    .build();
-            result.add(tickerRateIntervalData);
         }
+        tickerRateIntervalData = TickerRateIntervalData.builder()
+                .minRate(minRate)
+                .maxRate(maxRate)
+                .avgRate(avgRate / count)
+                .startDate(intStart)
+                .build();
+        result.add(tickerRateIntervalData);
         return result;
     }
 }

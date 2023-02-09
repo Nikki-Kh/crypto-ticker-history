@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class TickerRateRequest {
-    @JsonProperty()
+    @JsonProperty(required = true)
     Integer brkId;
     @JsonProperty(required = true)
     String tickerName;
