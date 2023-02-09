@@ -3,6 +3,8 @@ package com.nikh.cth.cache;
 import com.nikh.cth.bean.broker.BrokerToTickerDBEntry;
 import com.nikh.cth.dao.BrokerDao;
 import com.nikh.cth.error.ServerException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -29,6 +31,9 @@ public class BrokerCache {
             condition = "@environment.getActiveProfiles()[0] != 'test'")
     @Order(1)
     public void initCache() {
+        if (!CollectionUtils.isEmpty(brokers) && !MapUtils.isEmpty(brokerTickers)) {
+            return;
+        }
         brokers = brokerDao.getBrokers();
         brokerTickers = loadBrokerTickers();
         if (brokerTickers.isEmpty()) {

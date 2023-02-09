@@ -2,14 +2,11 @@ package com.nikh.cth.unit.cache;
 
 import com.nikh.cth.bean.broker.Broker;
 import com.nikh.cth.bean.broker.BrokerToTickerDBEntry;
-import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.cache.BrokerCache;
 import com.nikh.cth.dao.BrokerDao;
 
 import com.nikh.cth.error.ServerException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,6 +38,8 @@ class BrokerCacheTest {
 
 
     @Nested
+    @SpringBootTest
+    @ContextConfiguration(classes = {BrokerCache.class, BrokerDao.class})
     class BrokerCacheAfterInitTest {
 
         @BeforeEach
@@ -60,10 +59,8 @@ class BrokerCacheTest {
 
         @Test
         void testGetBrokers() {
-
-
             var result = brokerCache.getBrokers();
-            assertEquals(result.size(), 2);
+            assertEquals(2, result.size());
             assertTrue(result.containsAll(brokers));
         }
 
