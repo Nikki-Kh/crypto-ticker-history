@@ -27,4 +27,8 @@ public class BrokersController {
     }
 
 
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        return ResponseEntity.ok("test");
+    }
 }
