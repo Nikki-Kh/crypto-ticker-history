@@ -26,9 +26,4 @@ public class BrokersController {
         return ResponseEntity.ok(brokerService.getBrokerTickers(brkId));
     }
 
-
-    @GetMapping("/test")
-    public ResponseEntity<?> test() {
-        return ResponseEntity.ok("test");
-    }
 }

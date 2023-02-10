@@ -1,5 +1,6 @@
 package com.nikh.cth.config;
 
+import com.nikh.cth.web.entrypoint.AppAuthenticationEntryPoint;
 import com.nikh.cth.web.filter.AuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,8 @@ public class AppWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
     @Autowired
+    private AppAuthenticationEntryPoint authenticationEntryPoint;
+    @Autowired
     private UserDetailsService userDetailsService;
     @Autowired
     private AuthFilter filter;
@@ -35,8 +38,7 @@ public class AppWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
     @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws
-            Exception {
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
@@ -45,6 +47,8 @@ public class AppWebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests().antMatchers("/auth").permitAll()
                 .anyRequest().authenticated()
+                .and()
+                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
