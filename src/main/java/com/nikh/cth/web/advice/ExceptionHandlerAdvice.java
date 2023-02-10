@@ -22,6 +22,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
         log.info("Error request:{}, message: {}",request,e.getMessage());
         HttpStatus status = switch (e.getExceptionCode()) {
             case 1 -> HttpStatus.BAD_REQUEST;
+            case 3,4,5 -> HttpStatus.UNAUTHORIZED;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
         return ResponseEntity.status(status)

@@ -7,6 +7,6 @@ public interface TokenManagerService {
 
      String generateJwtToken(UserDetails details);
 
-     Boolean validateJwtToken(String token) throws ApiException;
+     UserDetails validateJwtToken(String token) throws ApiException;
 
 }

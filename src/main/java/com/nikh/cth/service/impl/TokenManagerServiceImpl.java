@@ -9,10 +9,13 @@ import com.google.gson.JsonParser;
 import com.nikh.cth.error.ApiException;
 import com.nikh.cth.error.ExceptionCode;
 import com.nikh.cth.service.TokenManagerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.auth0.jwt.JWT;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 
 import java.time.Instant;
@@ -21,12 +24,16 @@ import java.util.Date;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Service
 public class TokenManagerServiceImpl implements TokenManagerService {
 
     @Value("${spring.security.token.validity:3600}")
     private long TOKEN_VALIDITY;
     @Value("${spring.security.secret}")
     private String jwtSecret;
+
+    @Autowired
+    UserDetailsService userDetailsService;
 
 
 
@@ -41,7 +48,7 @@ public class TokenManagerServiceImpl implements TokenManagerService {
     }
 
     @Override
-    public Boolean validateJwtToken(String token) throws ApiException {
+    public UserDetails validateJwtToken(String token) throws ApiException {
         try {
             final Algorithm algorithm = Algorithm.
                     HMAC256(jwtSecret);
@@ -54,7 +61,7 @@ public class TokenManagerServiceImpl implements TokenManagerService {
                 throw new JWTVerificationException("Wrong token format");
             }
             var name = jsonPayload.get("name").getAsString();
-            return true;
+            return userDetailsService.loadUserByUsername(name);
         }
         catch (final TokenExpiredException e) {
             throw new ApiException( "Token Expired", e, ExceptionCode.TOKEN_EXPIRED);
