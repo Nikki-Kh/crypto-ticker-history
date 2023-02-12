@@ -4,11 +4,10 @@ import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.bean.web.response.KrakenTickerRateResponse;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import com.nikh.cth.error.ApiException;
-import com.nikh.cth.error.ExceptionCode;
-import lombok.Builder;
-import lombok.SneakyThrows;
+import com.nikh.cth.utils.ExceptionCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,7 +30,8 @@ public final class KrakenTickerRateUpdateTask extends TickerRateUpdateTask{
     @Override
     protected List<TickerRate> getLatestTickerRates(){
         try {
-            var result = webClient.get().uri(apiAddr + urlSuffix + StringUtils.joinWith(",", tickers))
+            var url = apiAddr.concat(urlSuffix).concat(StringUtils.joinWith(",", tickers.toArray()));
+            var result = webClient.get().uri(url)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()
                     .toEntity(KrakenTickerRateResponse.class)
@@ -39,6 +39,9 @@ public final class KrakenTickerRateUpdateTask extends TickerRateUpdateTask{
             if (!result.hasBody() || !CollectionUtils.isEmpty(Objects.requireNonNull(result.getBody()).getErrors())) {
                 throw new ApiException(result.hasBody() ?
                         StringUtils.joinWith(";", Objects.requireNonNull(result.getBody()).getErrors()) : "Empty response", ExceptionCode.HTTP_CALL_FAILED);
+            }
+            if (MapUtils.isEmpty(result.getBody().getResult())) {
+                log.warn("Broker update job retrieved empty result.\n Broker: {};\n Url: {}", brokerName, url);
             }
             return result.getBody().getResult().entrySet().stream()
                     .map(entry -> TickerRate.builder()

@@ -1,4 +1,4 @@
-package com.nikh.cth.error;
+package com.nikh.cth.utils;
 
 import org.intellij.lang.annotations.MagicConstant;
 

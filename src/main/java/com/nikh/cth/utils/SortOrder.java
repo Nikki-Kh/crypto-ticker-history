@@ -1,4 +1,4 @@
-package com.nikh.cth.dao;
+package com.nikh.cth.utils;
 
 import org.intellij.lang.annotations.MagicConstant;
 

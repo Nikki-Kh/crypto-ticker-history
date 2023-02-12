@@ -7,7 +7,8 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.JsonParser;
 import com.nikh.cth.error.ApiException;
-import com.nikh.cth.error.ExceptionCode;
+import com.nikh.cth.utils.Consts;
+import com.nikh.cth.utils.ExceptionCode;
 import com.nikh.cth.service.TokenManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +43,7 @@ public class TokenManagerServiceImpl implements TokenManagerService {
         final Algorithm algorithm = Algorithm.
                 HMAC256(jwtSecret);
         return JWT.create()
-                .withClaim("name", details.getUsername())
+                .withClaim(Consts.NAME_JSON_FIELD, details.getUsername())
                 .withExpiresAt(Date.from(Instant.now().plus(TOKEN_VALIDITY, ChronoUnit.SECONDS)))
                 .sign(algorithm);
     }
@@ -57,10 +58,10 @@ public class TokenManagerServiceImpl implements TokenManagerService {
             final DecodedJWT jwt = verifier.verify(token);
             var payload = new String(Base64Utils.decode(jwt.getPayload().getBytes(UTF_8)));
             var jsonPayload = JsonParser.parseString(payload).getAsJsonObject();
-            if (!jsonPayload.has("name")) {
+            if (!jsonPayload.has(Consts.NAME_JSON_FIELD)) {
                 throw new JWTVerificationException("Wrong token format");
             }
-            var name = jsonPayload.get("name").getAsString();
+            var name = jsonPayload.get(Consts.NAME_JSON_FIELD).getAsString();
             return userDetailsService.loadUserByUsername(name);
         }
         catch (final TokenExpiredException e) {

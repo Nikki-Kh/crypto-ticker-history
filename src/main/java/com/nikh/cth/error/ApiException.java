@@ -1,6 +1,7 @@
 package com.nikh.cth.error;
 
 
+import com.nikh.cth.utils.ExceptionCode;
 import lombok.Getter;
 
 @Getter

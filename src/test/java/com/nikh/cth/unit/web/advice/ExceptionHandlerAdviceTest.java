@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.error.ApiException;
 import com.nikh.cth.service.impl.TickerRateServiceImpl;
+import com.nikh.cth.unit.web.controller.TestSecurityConfig;
 import com.nikh.cth.web.advice.ExceptionHandlerAdvice;
 import com.nikh.cth.web.controller.TickersController;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,7 +29,8 @@ import static org.mockito.Mockito.*;
 
 @WebMvcTest(controllers = TickersController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ContextConfiguration(classes = {TickerRateServiceImpl.class, TickersController.class, ExceptionHandlerAdvice.class})
+@ContextConfiguration(classes = {TickerRateServiceImpl.class, TickersController.class,
+        ExceptionHandlerAdvice.class, TestSecurityConfig.class})
 class ExceptionHandlerAdviceTest {
 
     @Autowired

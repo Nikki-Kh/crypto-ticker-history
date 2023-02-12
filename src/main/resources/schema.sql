@@ -1,3 +1,11 @@
+CREATE TABLE users (
+    username VARCHAR(32) NOT NULL,
+    password VARCHAR,
+    created_when timestamp default now(),
+    updated_when timestamp default now(),
+    PRIMARY KEY (username)
+);
+
 CREATE TABLE brokers (
     brk_id INTEGER NOT NULL AUTO_INCREMENT,
     brk_name VARCHAR(32) NOT NULL,

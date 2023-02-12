@@ -3,10 +3,11 @@ package com.nikh.cth.service.impl;
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.bean.ticker.TickerRateIntervalData;
-import com.nikh.cth.dao.SortOrder;
+import com.nikh.cth.cache.BrokerCache;
+import com.nikh.cth.utils.SortOrder;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import com.nikh.cth.error.ApiException;
-import com.nikh.cth.error.ExceptionCode;
+import com.nikh.cth.utils.ExceptionCode;
 import com.nikh.cth.service.TickerRateService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TickerRateServiceImpl implements TickerRateService {
@@ -26,8 +29,9 @@ public class TickerRateServiceImpl implements TickerRateService {
 
 
     @Override
-    public List<TickerRate> getLastTickerRates(Integer brkId) {
-        return tickerRateHistoryDao.getLastTickerRates(brkId);
+    public Map<Integer, List<TickerRate>> getLastTickerRates(Integer brkId) {
+        var rates =  tickerRateHistoryDao.getLastTickerRates(brkId);
+        return rates.stream().collect(Collectors.groupingBy(TickerRate::getBrkId));
     }
 
     @Override

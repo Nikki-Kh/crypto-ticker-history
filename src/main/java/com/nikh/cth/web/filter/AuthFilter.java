@@ -3,7 +3,10 @@ package com.nikh.cth.web.filter;
 
 import com.nikh.cth.error.ApiException;
 import com.nikh.cth.service.TokenManagerService;
+import com.nikh.cth.utils.Consts;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,9 +34,9 @@ public class AuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var tokenHeader = request.getHeader("Authorization");
-        if (tokenHeader != null && tokenHeader.startsWith("Bearer ") ) {
-            var token = tokenHeader.substring(7);
+        var tokenHeader = request.getHeader(Consts.AUTHORIZATION_HEADER);
+        if (tokenHeader != null && tokenHeader.startsWith(Consts.BEARER_PREFIX.concat(StringUtils.SPACE)) ) {
+            var token = tokenHeader.split(StringUtils.SPACE)[1];
             try {
                 var userDetails = tokenManager.validateJwtToken(token);
                 var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.emptyList());
@@ -45,4 +48,5 @@ public class AuthFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
 }

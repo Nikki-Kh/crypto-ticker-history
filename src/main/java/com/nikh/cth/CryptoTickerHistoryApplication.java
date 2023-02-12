@@ -7,12 +7,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import static org.springframework.boot.SpringApplication.run;
 
+@EnableScheduling
 @SpringBootApplication
 @MapperScan("com.nikh.cth.dao")
-@EnableScheduling
 public class CryptoTickerHistoryApplication {
-
-    private static ApplicationContext applicationContext;
 
     public static void main(String[] args) {
         run(CryptoTickerHistoryApplication.class, args);

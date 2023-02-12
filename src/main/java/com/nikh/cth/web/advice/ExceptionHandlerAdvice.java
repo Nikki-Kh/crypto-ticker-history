@@ -1,11 +1,14 @@
 package com.nikh.cth.web.advice;
 
 import com.nikh.cth.error.ApiException;
-import com.nikh.cth.error.ErrorBean;
+import com.nikh.cth.bean.response.ErrorResponse;
+import com.nikh.cth.utils.ExceptionCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -26,21 +29,32 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
         return ResponseEntity.status(status)
-                .body(ErrorBean.builder()
+                .body(ErrorResponse.builder()
                         .url(((ServletWebRequest)request).getRequest().getRequestURI())
                         .code(e.getExceptionCode())
-                        .message(e.getMessage())
+                        .message(e.getLocalizedMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(value = { AuthenticationException.class, AccessDeniedException.class})
+    protected ResponseEntity<?> apiException(Exception e, WebRequest request) {
+        log.info("Error request:{}, message: {}",request,e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.builder()
+                        .url(((ServletWebRequest)request).getRequest().getRequestURI())
+                        .code(ExceptionCode.UNAUTHORIZED)
+                        .message(e.getLocalizedMessage())
                         .build());
     }
 
     @ExceptionHandler(value = { Exception.class })
     protected ResponseEntity<?> defaultException(Exception e, WebRequest request) {
-        log.error("Exception request:{}",request,e);
+        log.error("Error request:{}", request, e);
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                .body(ErrorBean.builder()
+                .body(ErrorResponse.builder()
                         .url(((ServletWebRequest)request).getRequest().getRequestURI())
                         .code(0)
-                        .message(e.getMessage())
+                        .message(e.getLocalizedMessage())
                         .build());
     }
 
@@ -60,10 +74,10 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> resolveException(Exception e, WebRequest request){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorBean.builder()
+                .body(ErrorResponse.builder()
                         .url(((ServletWebRequest)request).getRequest().getRequestURI())
                         .code(0)
-                        .message(e.getMessage())
+                        .message(e.getLocalizedMessage())
                         .build());
 
     }

@@ -2,12 +2,9 @@ package com.nikh.cth.dao;
 
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import com.nikh.cth.utils.SortOrder;
+import org.apache.ibatis.annotations.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -20,8 +17,9 @@ public interface TickerRateHistoryDao {
              FROM ticker_rate_history
              GROUP BY brk_id, ticker_name) ltd
             WHERE th1.brk_id = ltd.brk_id
-            AND th1.brk_id = ltd.brk_id
-            <if test = "#{brkId} != null">
+            AND th1.created_when = ltd.created_when
+            AND th1.ticker_name = ltd.ticker_name
+            <if test = "brkId != null">
                 AND th1.brk_id = #{brkId}
             </if>
             ORDER BY th1.brk_id, th1.ticker_name
@@ -31,16 +29,21 @@ public interface TickerRateHistoryDao {
 
 
     String GET_TICKER_RATE_HISTORY_BY_DATES_SQL = """
-            SELECT * from ticker_rate_history
+            <script>
+            SELECT * from ticker_rate_history 
             WHERE brk_id = #{request.brkId}
             AND ticker_name = #{request.tickerName}
             AND created_when >= #{request.startDate}
-            AND created_when <= #{request.endDate}
-            ORDER BY created_when #{order}
+            AND #{request.endDate} > created_when 
+            ORDER BY created_when
+            <if test = "order == 'desc'">
+                DESC
+            </if>  
+            </script>
             """;
 
 
-    String INSERT_NEW_TICKER_RATES_SQL = """
+    String INSERT_NEW_TICKER_RATES_SQL = """    
             <script>
             INSERT INTO ticker_rate_history
             (brk_id, ticker_name, ticker_rate)

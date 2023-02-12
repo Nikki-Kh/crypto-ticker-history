@@ -5,12 +5,14 @@ import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Data
+@Slf4j
 @AllArgsConstructor
 public abstract class TickerRateUpdateTask implements Runnable{
 
@@ -30,14 +32,15 @@ public abstract class TickerRateUpdateTask implements Runnable{
     @Override
     public void run() {
         var result = getLatestTickerRates();
+        log.info("Timestamp: {};\n Broker: {};\n Result: {}", LocalDateTime.now(), brokerName, result);
         if (!result.isEmpty()) {
-            uploadDataToDatabase(result);
+            var count = uploadDataToDatabase(result);
         }
     }
 
     protected abstract List<TickerRate> getLatestTickerRates();
 
-    protected void uploadDataToDatabase(List<TickerRate> rates) {
-        tickerRateHistoryDao.insertNewTickerRates(rates);
+    protected int uploadDataToDatabase(List<TickerRate> rates) {
+        return tickerRateHistoryDao.insertNewTickerRates(rates);
     }
 }

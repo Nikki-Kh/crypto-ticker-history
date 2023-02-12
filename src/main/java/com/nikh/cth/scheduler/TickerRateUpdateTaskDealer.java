@@ -3,6 +3,7 @@ package com.nikh.cth.scheduler;
 import com.nikh.cth.cache.BrokerCache;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import com.nikh.cth.error.ServerException;
+import com.nikh.cth.utils.BrokerName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.SingletonBeanRegistry;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -35,6 +36,8 @@ public class TickerRateUpdateTaskDealer {
     @Autowired
     TickerRateHistoryDao tickerRateHistoryDao;
 
+    private static final String UPDATE_TASK_SUFFIX = "UpdateTask";
+
 
     @EventListener(value = ApplicationReadyEvent.class,
             condition = "@environment.getActiveProfiles()[0] != 'test'")
@@ -46,10 +49,9 @@ public class TickerRateUpdateTaskDealer {
         jobsMap = new HashMap<>();
         var brokers = brokerCache.getBrokers();
         brokers.forEach(broker -> {
-
             var tickers = brokerCache.getTickers(broker.getBrkId());
             TickerRateUpdateTask task = switch(broker.getBrkName()) {
-                case "Kraken" -> new KrakenTickerRateUpdateTask(broker.getBrkId(),
+                case BrokerName.KRAKEN -> new KrakenTickerRateUpdateTask(broker.getBrkId(),
                         broker.getBrkName(),
                         broker.getUpdInterval(),
                         broker.getApiAddr(),
@@ -57,7 +59,7 @@ public class TickerRateUpdateTaskDealer {
                         webClient,
                         tickers,
                         tickerRateHistoryDao);
-                case "Kucoin" -> new KucoinTickerRateUpdateTask(broker.getBrkId(),
+                case BrokerName.KUCOIN -> new KucoinTickerRateUpdateTask(broker.getBrkId(),
                         broker.getBrkName(),
                         broker.getUpdInterval(),
                         broker.getApiAddr(),
@@ -77,7 +79,7 @@ public class TickerRateUpdateTaskDealer {
     private void createBean(TickerRateUpdateTask task) {
         ConfigurableApplicationContext configContext = (ConfigurableApplicationContext) context;
         SingletonBeanRegistry beanRegistry = configContext.getBeanFactory();
-        beanRegistry.registerSingleton(task.getBrokerName() + "UpdateTask", task);
+        beanRegistry.registerSingleton(task.getBrokerName().concat(UPDATE_TASK_SUFFIX), task);
     }
 
     public Map<String, ScheduledFuture<?>> getJobsMap() {

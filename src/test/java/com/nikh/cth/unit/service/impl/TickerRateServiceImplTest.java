@@ -3,10 +3,9 @@ package com.nikh.cth.unit.service.impl;
 import com.nikh.cth.bean.request.TickerRateRequest;
 import com.nikh.cth.bean.ticker.TickerRate;
 import com.nikh.cth.bean.ticker.TickerRateIntervalData;
-import com.nikh.cth.dao.SortOrder;
+import com.nikh.cth.utils.SortOrder;
 import com.nikh.cth.dao.TickerRateHistoryDao;
 import com.nikh.cth.error.ApiException;
-import com.nikh.cth.service.TickerRateService;
 import com.nikh.cth.service.impl.TickerRateServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -40,18 +39,21 @@ class TickerRateServiceImplTest {
         var now = LocalDateTime.now();
         var tr1 = TickerRate.builder().brkId(1).tickerName("t1").value(1.0f).createdWhen(now).updWhen(now).build();
         var tr2 = TickerRate.builder().brkId(2).tickerName("t2").value(1.0f).createdWhen(now).updWhen(now).build();
-        var tr3 = TickerRate.builder().brkId(3).tickerName("t2").value(1.3f).createdWhen(now.minus(1, ChronoUnit.MINUTES)).updWhen(now).build();
-        var lastRates = List.of(tr1, tr2);
+        var tr2_1 = TickerRate.builder().brkId(2).tickerName("t3").value(1.3f).createdWhen(now.minus(1, ChronoUnit.MINUTES)).updWhen(now).build();
+        var lastRates = List.of(tr1, tr2, tr2_1);
 
         when(tickerRateHistoryDao.getLastTickerRates(null)).thenReturn(lastRates);
         var result1 = tickerRateService.getLastTickerRates(null);
         assertEquals(result1.size(), 2);
-        assertTrue(result1.containsAll(lastRates) && lastRates.containsAll(result1));
+        assertTrue(result1.containsKey(1) && result1.containsKey(2));
+        assertTrue(result1.get(1).size() == 1 && result1.get(2).containsAll(List.of(tr2, tr2_1)));
 
+        var tr3 = TickerRate.builder().brkId(3).tickerName("t2").value(1.3f).createdWhen(now.minus(1, ChronoUnit.MINUTES)).updWhen(now).build();
         when(tickerRateHistoryDao.getLastTickerRates(eq(3))).thenReturn(List.of(tr3));
         var result2 = tickerRateService.getLastTickerRates(3);
         assertEquals(1, result2.size());
-        assertTrue(result2.contains(tr3));
+        assertTrue(result2.containsKey(3));
+        assertTrue(result2.get(3).contains(tr3));
     }
 
     @Test

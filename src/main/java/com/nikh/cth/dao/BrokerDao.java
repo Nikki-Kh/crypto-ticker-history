@@ -25,6 +25,7 @@ public interface BrokerDao {
 
     @Select(GET_BROKERS_SQL)
     List<Broker> getBrokers();
+
     @Select(GET_TICKERS_BY_BROKER_SQL)
     List<String> getBrokerTickers(@Param("brkId") Integer brkId);
 

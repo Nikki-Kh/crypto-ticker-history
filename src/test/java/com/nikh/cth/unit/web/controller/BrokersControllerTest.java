@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BrokersController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ContextConfiguration(classes = {BrokerServiceImpl.class, BrokersController.class})
+@ContextConfiguration(classes = {BrokerServiceImpl.class, BrokersController.class, TestSecurityConfig.class})
 class BrokersControllerTest {
 
     @Autowired

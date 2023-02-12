@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.mockito.Mockito.*;
@@ -30,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = TickersController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ContextConfiguration(classes = {TickerRateServiceImpl.class, TickersController.class, ExceptionHandlerAdvice.class})
+@ContextConfiguration(classes = {TickerRateServiceImpl.class, TickersController.class,
+        ExceptionHandlerAdvice.class, TestSecurityConfig.class})
 class TickersControllerTest {
 
     @MockBean
@@ -53,13 +55,14 @@ class TickersControllerTest {
         var now = LocalDateTime.now();
         var tr1 = TickerRate.builder().brkId(1).tickerName("tr1").value(1.0f).createdWhen(now).updWhen(now).build();
         var tr2 = TickerRate.builder().brkId(1).tickerName("tr2").value(1.3f).createdWhen(now).updWhen(now).build();
-        var tickerRates = List.of(tr1, tr2);
+        var tickerRatesList = List.of(tr1, tr2);
+        var tickerRatesMap = tickerRatesList.stream().collect(Collectors.groupingBy(TickerRate::getBrkId));
 
-        when(tickerRateService.getLastTickerRates(eq(1))).thenReturn(tickerRates);
+        when(tickerRateService.getLastTickerRates(eq(1))).thenReturn(tickerRatesMap);
 
         mockMvc.perform(get("/tickers/rates?brkId=1"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(mapper.writeValueAsString(tickerRates)));
+                .andExpect(content().string(mapper.writeValueAsString(tickerRatesMap)));
     }
     @Test
     void getLastTickerRatesWithoutBrokerId() throws Exception {
@@ -69,13 +72,14 @@ class TickersControllerTest {
         var tr2 = TickerRate.builder().brkId(1).tickerName("tr2").value(1.3f).createdWhen(now).updWhen(now).build();
         var tr3 = TickerRate.builder().brkId(2).tickerName("tr3").value(1.0f).createdWhen(now).updWhen(now).build();
         var tr4 = TickerRate.builder().brkId(2).tickerName("tr4").value(1.3f).createdWhen(now).updWhen(now).build();
-        var tickerRates = List.of(tr1, tr2, tr3, tr4);
+        var tickerRatesList = List.of(tr1, tr2, tr3, tr4);
+        var tickerRatesMap = tickerRatesList.stream().collect(Collectors.groupingBy(TickerRate::getBrkId));
 
-        when(tickerRateService.getLastTickerRates(null)).thenReturn(tickerRates);
+        when(tickerRateService.getLastTickerRates(null)).thenReturn(tickerRatesMap);
 
         mockMvc.perform(get("/tickers/rates"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(mapper.writeValueAsString(tickerRates)));
+                .andExpect(content().string(mapper.writeValueAsString(tickerRatesMap)));
     }
 
     @Test
@@ -95,10 +99,10 @@ class TickersControllerTest {
         req1.setEndDate(now.plus(2,ChronoUnit.MINUTES));
 
         var req2 = new TickerRateRequest();
-        req1.setBrkId(2);
-        req1.setTickerName("tr2");
-        req1.setStartDate(now.minus(1,ChronoUnit.MINUTES));
-        req1.setEndDate(now.plus(2,ChronoUnit.MINUTES));
+        req2.setBrkId(2);
+        req2.setTickerName("tr2");
+        req2.setStartDate(now.minus(1,ChronoUnit.MINUTES));
+        req2.setEndDate(now.plus(2,ChronoUnit.MINUTES));
 
         when(tickerRateService.getTickerHistory(eq(req1))).thenReturn(tickerRates1);
         when(tickerRateService.getTickerHistory(eq(req2))).thenReturn(tickerRates2);
