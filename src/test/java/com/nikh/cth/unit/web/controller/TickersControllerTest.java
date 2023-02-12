@@ -10,12 +10,14 @@ import com.nikh.cth.error.ApiException;
 import com.nikh.cth.service.impl.TickerRateServiceImpl;
 import com.nikh.cth.web.advice.ExceptionHandlerAdvice;
 import com.nikh.cth.web.controller.TickersController;
+import com.nikh.cth.web.entrypoint.AppAuthenticationEntryPoint;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = TickersController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration(classes = {TickerRateServiceImpl.class, TickersController.class,
-        ExceptionHandlerAdvice.class, TestSecurityConfig.class})
+        ExceptionHandlerAdvice.class, TestSecurityConfig.class, AppAuthenticationEntryPoint.class})
 class TickersControllerTest {
 
     @MockBean

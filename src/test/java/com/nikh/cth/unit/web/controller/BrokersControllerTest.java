@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nikh.cth.bean.broker.Broker;
 import com.nikh.cth.service.impl.BrokerServiceImpl;
 import com.nikh.cth.web.controller.BrokersController;
+import com.nikh.cth.web.entrypoint.AppAuthenticationEntryPoint;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,7 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BrokersController.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ContextConfiguration(classes = {BrokerServiceImpl.class, BrokersController.class, TestSecurityConfig.class})
+@ContextConfiguration(classes = {BrokerServiceImpl.class, BrokersController.class,
+        TestSecurityConfig.class, AppAuthenticationEntryPoint.class})
 class BrokersControllerTest {
 
     @Autowired

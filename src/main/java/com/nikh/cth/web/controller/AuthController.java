@@ -2,7 +2,9 @@ package com.nikh.cth.web.controller;
 
 import com.nikh.cth.bean.request.AuthRequest;
 import com.nikh.cth.bean.response.AuthResponse;
+import com.nikh.cth.error.ApiException;
 import com.nikh.cth.service.TokenManagerService;
+import com.nikh.cth.utils.ExceptionCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,9 +38,9 @@ public class AuthController {
                             request.getPassword())
             );
         } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
+            throw new ApiException("USER_DISABLED", e, ExceptionCode.UNAUTHORIZED);
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            throw new ApiException("INVALID_CREDENTIALS", e, ExceptionCode.UNAUTHORIZED);
         }
         final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         final String jwtToken = tokenManager.generateJwtToken(userDetails);
