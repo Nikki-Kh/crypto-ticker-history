@@ -13,4 +13,5 @@ public class TickerRateIntervalData {
     Float minRate;
     Float maxRate;
     Float avgRate;
+    String details;
 }

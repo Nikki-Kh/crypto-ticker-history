@@ -46,7 +46,7 @@ public class TickerRateServiceImpl implements TickerRateService {
         if (tickerHistory.isEmpty()) {
             return Collections.emptyList();
         }
-        return getIntervalData(tickerHistory, chronoPair);
+        return getIntervalData(tickerHistory, chronoPair, request.getStartDate(), request.getEndDate());
     }
 
     private Pair<Integer, ChronoUnit> parseIntervalExp( String exp) throws ApiException {
@@ -61,47 +61,59 @@ public class TickerRateServiceImpl implements TickerRateService {
         return Pair.of(period, chronoUnit);
     }
 
-    private List<TickerRateIntervalData> getIntervalData(List<TickerRate> tickerHistory, Pair<Integer, ChronoUnit> chronoPair) {
+    private List<TickerRateIntervalData> getIntervalData(List<TickerRate> tickerHistory,
+                                                          Pair<Integer, ChronoUnit> chronoPair,
+                                                          LocalDateTime start, LocalDateTime end) {
         var result = new ArrayList<TickerRateIntervalData>();
-        TickerRateIntervalData tickerRateIntervalData;
         var thIterator = tickerHistory.iterator();
         TickerRate tickerRate = thIterator.next();
-        Float minRate = tickerRate.getValue();
-        Float maxRate = tickerRate.getValue();
-        Float avgRate = tickerRate.getValue();
-        LocalDateTime intStart = tickerRate.getCreatedWhen();
+        Float minRate = null;
+        Float maxRate = null;
+        Float avgRate = null;
+        LocalDateTime intStart = start;
         LocalDateTime intEnd = intStart.plus(chronoPair.getLeft(), chronoPair.getRight());
-        int count = 1;
-        while(thIterator.hasNext()) {
-            tickerRate = thIterator.next();
-            if (tickerRate.getCreatedWhen().isBefore(intEnd)) {
-                minRate = Float.min(minRate, tickerRate.getValue());
-                maxRate = Float.max(maxRate, tickerRate.getValue());
-                avgRate += tickerRate.getValue();
-                count++;
-            } else {
-                tickerRateIntervalData = TickerRateIntervalData.builder()
-                        .minRate(minRate)
-                        .maxRate(maxRate)
-                        .avgRate(avgRate / count)
-                        .startDate(intStart)
-                        .build();
-                result.add(tickerRateIntervalData);
-                minRate = tickerRate.getValue();
-                maxRate = tickerRate.getValue();
-                avgRate = tickerRate.getValue();
+        int count = 0;
+        while (intStart.isBefore(end)){
+            if (tickerRate == null) {
+                result.add(getIntervalData(minRate, maxRate, avgRate, count, start));
+                minRate = maxRate = avgRate = null;
+                count = 0;
                 intStart = intEnd;
                 intEnd = intStart.plus(chronoPair.getLeft(), chronoPair.getRight());
-                count = 1;
+            } else {
+                var crWhen = tickerRate.getCreatedWhen();
+                if (!crWhen.isBefore(intStart) && crWhen.isBefore(intEnd)){
+                    if (minRate == null) {
+                        minRate = maxRate = avgRate = tickerRate.getValue();
+                    } else {
+                        minRate = Float.min(minRate, tickerRate.getValue());
+                        maxRate = Float.max(maxRate, tickerRate.getValue());
+                        avgRate += tickerRate.getValue();
+                    }
+                    count++;
+                    tickerRate = thIterator.hasNext() ? thIterator.next() : null;
+                }
+                else {
+                    result.add(getIntervalData(minRate, maxRate, avgRate, count, start));
+                    minRate = maxRate = avgRate = null;
+                    count = 0;
+                    intStart = intEnd;
+                    intEnd = intStart.plus(chronoPair.getLeft(), chronoPair.getRight());
+                }
             }
         }
-        tickerRateIntervalData = TickerRateIntervalData.builder()
+        return result;
+    }
+
+
+    private TickerRateIntervalData getIntervalData(Float minRate, Float maxRate, Float avgRate,
+                                                   int count, LocalDateTime start) {
+        return  TickerRateIntervalData.builder()
                 .minRate(minRate)
                 .maxRate(maxRate)
-                .avgRate(avgRate / count)
-                .startDate(intStart)
+                .avgRate( count == 0 ? null : avgRate/count)
+                .startDate(start)
+                .details(count == 0 ? "No data for this interval" : null)
                 .build();
-        result.add(tickerRateIntervalData);
-        return result;
     }
 }
