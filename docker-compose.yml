@@ -1,6 +1,6 @@
 version: '1'
 services:
-  review-server:
+  crypto-ticker-history-server:
     container_name: crypto-ticker-history-server
     build:
       context: crypto-ticker-history
