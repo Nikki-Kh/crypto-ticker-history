@@ -10,6 +10,14 @@ The Various REST endpoints are provided to operate with existing and collected d
 3) **get last ticker rates wih ability to specify broker;** 
 4) **get interval data for desired time window.**
 
+On a startup application perform 2 important steps:
+1) Collect descriptive information about brokers and tracked tickers into cache,
+   since this kind of information won't be updated often and can be stored in-memory to speed up data retrieval.
+2) `TickerRateUpdateTaskDealer` component get information about brokers and register recurrent tasks of type
+`TickerRateUpdateTask` to connect to brokers' API and get the latest ticker rates.
+Update period is specified in DB and is represented by `updInterval` field.
+Once data is collected with the help of `WebClient`, it is then stored in DB.
+
 ### Database
 For demonstration purpose H2 embedded in-memory database is used.
 This DB contains four tables:
@@ -77,7 +85,7 @@ Response:
 ```
 
 ### Brokers
-#### /Brokers
+#### /brokers
 Description: endpoint to get information about supported brokers.
 To get access to this endpoint Auth token should be provided.
 ```
